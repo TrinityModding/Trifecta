@@ -9,7 +9,7 @@ import java.nio.IntBuffer;
 import static org.lwjgl.nuklear.Nuklear.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
-class EditorUi {
+public class EditorUi {
     private static final NkRect RECT = NkRect.malloc();
     private static final NkVec2 VEC2 = NkVec2.malloc();
 
@@ -24,7 +24,7 @@ class EditorUi {
 
     public void render(NkContext ctx, int windowWidth, int windowHeight) {
         try (var stack = stackPush()) {
-            if (nk_begin(ctx, "Toolbar", nk_rect(0, 0, 1920, 35, RECT), NK_WINDOW_NO_SCROLLBAR)) {
+            if (nk_begin(ctx, "Toolbar", nk_rect(0, 0, windowWidth, 35, RECT), NK_WINDOW_NO_SCROLLBAR)) {
 
                 nk_menubar_begin(ctx);
                 nk_layout_row_static(ctx, 30, 50, 4);
@@ -47,7 +47,7 @@ class EditorUi {
             }
             nk_end(ctx);
 
-            if (nk_begin(ctx, "Scene", nk_rect(0, 35, 340, 990, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE)) {
+            if (nk_begin(ctx, "Scene", nk_rect(0, 35, 340, windowHeight - 35, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE)) {
                 nk_layout_row_dynamic(ctx, 25, 1);
                 // Inside the main loop
                 if (nk_tree_push_hashed(ctx, NK_TREE_TAB, "untitled.trscn", NK_MAXIMIZED, stack.UTF8("untitled.trscn"), 1)) {
@@ -82,7 +82,7 @@ class EditorUi {
             }
             nk_end(ctx);
 
-            if (nk_begin(ctx, "Properties", nk_rect(1920 - 340, 35, 340, 990, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE | NK_WINDOW_SCALE_LEFT)) {
+            if (nk_begin(ctx, "Properties", nk_rect(windowWidth - 340, 35, 340, windowHeight - 35, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE | NK_WINDOW_SCALE_LEFT)) {
                 nk_layout_row_static(ctx, 30, 80, 1);
                 if (nk_button_label(ctx, "button")) System.out.println("button pressed");
 
