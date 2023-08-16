@@ -58,13 +58,10 @@ public class EditorRenderer {
     public EditorRenderer() {
         try {
             this.ttf = IOUtil.ioResourceToByteBuffer("FiraSans-light.ttf", 512 * 1024);
+            run();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void main(String[] args) {
-        new EditorRenderer().run();
     }
 
     public void run() {
@@ -84,7 +81,7 @@ public class EditorRenderer {
         }
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
-        this.win = glfwCreateWindow(1920, 1080, "GLFW Nuklear Demo", NULL, NULL);
+        this.win = glfwCreateWindow(1920, 1080, "Trifecta Trinity Editor", NULL, NULL);
         if (win == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
