@@ -181,9 +181,9 @@ public class NuklearRenderer implements Closeable {
             stbtt_InitFont(fontInfo, fontBytes);
             scale = stbtt_ScaleForPixelHeight(fontInfo, FONT_HEIGHT);
 
-            var d = stack.mallocInt(1);
-            stbtt_GetFontVMetrics(fontInfo, null, d, null);
-            descent = d.get(0) * scale;
+            var pDescent = stack.mallocInt(1);
+            stbtt_GetFontVMetrics(fontInfo, null, pDescent, null);
+            descent = pDescent.get(0) * scale;
 
             var bitmap = memAlloc(BITMAP_W * BITMAP_H);
 

@@ -48,6 +48,5 @@ public class Main {
         var renderer = new EditorRenderer(win);
         renderer.run();
         debugProc.free();
-        renderer.close();
     }
 }

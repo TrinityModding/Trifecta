@@ -1,27 +1,35 @@
+import com.osmerion.gradle.lwjgl3.*
+
 plugins {
     id("java")
+    id("com.osmerion.lwjgl3") version "0.1.0"
 }
 
 group = "me.hydos.trifecta"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(20))
+    }
 }
 
-dependencies {
-    implementation(platform("org.lwjgl:lwjgl-bom:3.3.2"))
+lwjgl3 {
+    targets {
+        named("main") {
+            modules.add(LWJGL.Core)
+            modules.add(LWJGL.GLFW)
+            modules.add(LWJGL.OpenGL)
+            modules.add(LWJGL.Nuklear)
+            modules.add(LWJGL.STB)
 
-    implementation("org.lwjgl", "lwjgl")
-    implementation("org.lwjgl", "lwjgl-glfw")
-    implementation("org.lwjgl", "lwjgl-nuklear")
-    implementation("org.lwjgl", "lwjgl-openal")
-    implementation("org.lwjgl", "lwjgl-opengl")
-    implementation("org.lwjgl", "lwjgl-stb")
-    runtimeOnly("org.lwjgl", "lwjgl", classifier = "natives-windows")
-    runtimeOnly("org.lwjgl", "lwjgl-glfw", classifier = "natives-windows")
-    runtimeOnly("org.lwjgl", "lwjgl-nuklear", classifier = "natives-windows")
-    runtimeOnly("org.lwjgl", "lwjgl-openal", classifier = "natives-windows")
-    runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = "natives-windows")
-    runtimeOnly("org.lwjgl", "lwjgl-stb", classifier = "natives-windows")
+            linuxX64()
+            macosX64()
+            windowsX64()
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
 }

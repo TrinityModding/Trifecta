@@ -15,7 +15,11 @@ public class EditorUi {
 
     private static final int EASY = 0;
     private static final int HARD = 1;
-    public final NkColorf clearCol = NkColorf.create().r(0.62f).g(0.74f).b(0.84f).a(1.0f);
+    public final NkColorf clearCol = NkColorf.create()
+            .r(0.15f)
+            .g(0.27f)
+            .b(0.36f)
+            .a(1.0f);
     private final IntBuffer compression = BufferUtils.createIntBuffer(1).put(0, 20);
     private int option = EASY;
     private final ByteBuffer bodySelected = BufferUtils.createByteBuffer(1).put(0, (byte) 0);
@@ -47,10 +51,8 @@ public class EditorUi {
             }
             nk_end(ctx);
 
-            if (nk_begin(ctx, "Scene", nk_rect(0, 35, 340, windowHeight - 35, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE)) {
-                nk_layout_row_dynamic(ctx, 25, 1);
-                // Inside the main loop
-                if (nk_tree_push_hashed(ctx, NK_TREE_TAB, "untitled.trscn", NK_MAXIMIZED, stack.UTF8("untitled.trscn"), 1)) {
+            if (nk_begin(ctx, "Scene", nk_rect(0, 35, 340, windowHeight - 35, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE)) {// Inside the main loop
+                if (nk_tree_push_hashed(ctx, NK_TREE_NODE, "untitled.trscn", NK_MAXIMIZED, stack.UTF8("untitled.trscn"), 1)) {
                     // Add your tree nodes here
                     if (nk_tree_push_hashed(ctx, NK_TREE_NODE, "pm0001", NK_MINIMIZED, stack.UTF8("pm0001"), 1)) {
                         nk_layout_row_dynamic(ctx, 25, 1);
