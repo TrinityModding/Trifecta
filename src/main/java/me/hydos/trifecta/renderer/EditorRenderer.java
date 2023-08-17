@@ -16,7 +16,7 @@ public class EditorRenderer implements Closeable {
 
     public EditorRenderer(long pWindow) {
         this.pWindow = pWindow;
-        this.uiRenderer = new NuklearRenderer();
+        this.uiRenderer = new NuklearRenderer(pWindow);
     }
 
     public void run() {

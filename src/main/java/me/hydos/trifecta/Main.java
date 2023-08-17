@@ -20,7 +20,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Main {
 
     public static void main(String[] args) {
-        System.loadLibrary("renderdoc");
         Configuration.DEBUG_STREAM.set(System.out);
         GLFWErrorCallback.createPrint().set();
         if (!glfwInit()) throw new IllegalStateException("Unable to initialize glfw");

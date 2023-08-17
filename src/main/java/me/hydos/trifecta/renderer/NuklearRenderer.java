@@ -43,7 +43,7 @@ public class NuklearRenderer implements Closeable {
     private int uniformTex;
     private int uniformProj;
 
-    public NuklearRenderer() {
+    public NuklearRenderer(long window) {
         try {
             this.allocator = NkAllocator.create()
                     .alloc((handle, old, size) -> nmemAllocChecked(size))
@@ -56,6 +56,7 @@ public class NuklearRenderer implements Closeable {
                     .flip();
 
             setupContext();
+            createContext(window);
             loadFont();
         } catch (IOException e) {
             throw new RuntimeException("Failed to load font", e);
@@ -81,8 +82,29 @@ public class NuklearRenderer implements Closeable {
 
     private void setupContext() {
         var NK_SHADER_VERSION = Platform.get() == Platform.MACOSX ? "#version 150\n" : "#version 300 es\n";
-        var vertex_shader = NK_SHADER_VERSION + "uniform mat4 ProjMtx;\n" + "in vec2 Position;\n" + "in vec2 TexCoord;\n" + "in vec4 Color;\n" + "out vec2 Frag_UV;\n" + "out vec4 Frag_Color;\n" + "void main() {\n" + "   Frag_UV = TexCoord;\n" + "   Frag_Color = Color;\n" + "   gl_Position = ProjMtx * vec4(Position.xy, 0, 1);\n" + "}\n";
-        var fragment_shader = NK_SHADER_VERSION + "precision mediump float;\n" + "uniform sampler2D Texture;\n" + "in vec2 Frag_UV;\n" + "in vec4 Frag_Color;\n" + "out vec4 Out_Color;\n" + "void main(){\n" + "   Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n" + "}\n";
+        var vertex_shader = NK_SHADER_VERSION + """
+                uniform mat4 ProjMtx;
+                in vec2 Position;
+                in vec2 TexCoord;
+                in vec4 Color;
+                out vec2 Frag_UV;
+                out vec4 Frag_Color;
+                                
+                void main() {
+                   Frag_UV = TexCoord;
+                   Frag_Color = Color;
+                   gl_Position = ProjMtx * vec4(Position.xy, 0, 1);
+                }""";
+        var fragment_shader = NK_SHADER_VERSION + """
+                precision mediump float;
+                uniform sampler2D Texture;
+                in vec2 Frag_UV;
+                in vec4 Frag_Color;
+                out vec4 Out_Color;
+                                
+                void main(){
+                   Out_Color = Frag_Color * texture(Texture, Frag_UV.st);
+                }""";
 
         nk_buffer_init(cmds, allocator, BUFFER_INITIAL_SIZE);
         prog = glCreateProgram();
