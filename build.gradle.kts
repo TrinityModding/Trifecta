@@ -32,4 +32,9 @@ lwjgl3 {
 
 repositories {
     mavenCentral()
+    maven("https://maven.generations.gg")
+}
+
+dependencies {
+    implementation("gg.generations:RareCandy:2.3.6-SNAPSHOT")
 }
