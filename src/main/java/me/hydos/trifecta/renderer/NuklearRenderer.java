@@ -32,7 +32,7 @@ public class NuklearRenderer implements Closeable {
     public final NkDrawVertexLayoutElement.Buffer vertexLayout;
     public final EditorUi editorUi = new EditorUi();
     public final NkContext ctx = NkContext.create();
-    public final NkUserFont default_font = NkUserFont.create();
+    public final NkUserFont font = NkUserFont.create();
     public final NkBuffer cmds = NkBuffer.create();
     public final NkDrawNullTexture null_texture = NkDrawNullTexture.create();
     // Gl Objects
@@ -55,7 +55,6 @@ public class NuklearRenderer implements Closeable {
                     .position(3).attribute(NK_VERTEX_ATTRIBUTE_COUNT).format(NK_FORMAT_COUNT).offset(0)
                     .flip();
 
-            setupContext();
             createContext(window);
             loadFont();
         } catch (IOException e) {
@@ -210,7 +209,7 @@ public class NuklearRenderer implements Closeable {
             memFree(bitmap);
         }
 
-        default_font.width((handle, h, text, len) -> {
+        font.width((handle, h, text, len) -> {
                     float text_width = 0;
                     try (var stack = stackPush()) {
                         var unicode = stack.mallocInt(1);
@@ -261,7 +260,7 @@ public class NuklearRenderer implements Closeable {
                 })
                 .texture(it -> it.id(fontTexID));
 
-        nk_style_set_font(ctx, default_font);
+        nk_style_set_font(ctx, font);
     }
 
     public void render(NkContext ctx, int width, int height) {
@@ -353,7 +352,7 @@ public class NuklearRenderer implements Closeable {
         glDisable(GL_SCISSOR_TEST);
     }
 
-    public NkContext createContext(long win) {
+    public void createContext(long win) {
         glfwSetScrollCallback(win, (window, xoffset, yoffset) -> {
             try (var stack = stackPush()) {
                 var scroll = NkVec2.malloc(stack).x((float) xoffset).y((float) yoffset);
@@ -452,25 +451,25 @@ public class NuklearRenderer implements Closeable {
         });
 
         setupContext();
-        return ctx;
     }
 
     @Override
     public void close() {
+        System.out.println("Closing");
         // Nk objects
         Objects.requireNonNull(ctx.clip().copy()).free();
         Objects.requireNonNull(ctx.clip().paste()).free();
         nk_free(ctx);
         nk_buffer_free(cmds);
-        Objects.requireNonNull(default_font.query()).free();
-        Objects.requireNonNull(default_font.width()).free();
+        Objects.requireNonNull(font.query()).free();
+        Objects.requireNonNull(font.width()).free();
 
         // Nk allocator
         Objects.requireNonNull(allocator.alloc()).free();
         Objects.requireNonNull(allocator.mfree()).free();
 
         // OpenGL objects
-        glDeleteTextures(default_font.texture().id());
+        glDeleteTextures(font.texture().id());
         glDeleteTextures(null_texture.texture().id());
         glDetachShader(prog, vertexShader);
         glDetachShader(prog, fragmentShader);
