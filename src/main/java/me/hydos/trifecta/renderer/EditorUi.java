@@ -51,7 +51,7 @@ public class EditorUi {
             }
             nk_end(ctx);
 
-            if (nk_begin(ctx, "Scene", nk_rect(0, 35, 340, windowHeight - 35, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE)) {// Inside the main loop
+            if (nk_begin(ctx, "Scene", nk_rect(0, 35, 340, windowHeight - 35, RECT), NK_WINDOW_TITLE)) {// Inside the main loop
                 if (nk_tree_push_hashed(ctx, NK_TREE_NODE, "untitled.trscn", NK_MAXIMIZED, stack.UTF8("untitled.trscn"), 1)) {
                     // Add your tree nodes here
                     if (nk_tree_push_hashed(ctx, NK_TREE_NODE, "pm0001", NK_MINIMIZED, stack.UTF8("pm0001"), 1)) {
@@ -84,7 +84,7 @@ public class EditorUi {
             }
             nk_end(ctx);
 
-            if (nk_begin(ctx, "Properties", nk_rect(windowWidth - 340, 35, 340, windowHeight - 35, RECT), NK_WINDOW_SCALABLE | NK_WINDOW_TITLE | NK_WINDOW_SCALE_LEFT)) {
+            if (nk_begin(ctx, "Properties", nk_rect(windowWidth - 340, 35, 340, windowHeight - 35, RECT), NK_WINDOW_TITLE | NK_WINDOW_SCALE_LEFT)) {
                 nk_layout_row_static(ctx, 30, 80, 1);
                 if (nk_button_label(ctx, "button")) System.out.println("button pressed");
 

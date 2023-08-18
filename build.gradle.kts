@@ -22,6 +22,7 @@ lwjgl3 {
             modules.add(LWJGL.OpenGL)
             modules.add(LWJGL.Nuklear)
             modules.add(LWJGL.STB)
+            modules.add(LWJGL.ParShapes)
 
             linuxX64()
             macosX64()
@@ -31,10 +32,12 @@ lwjgl3 {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
-    maven("https://maven.generations.gg")
+    maven("https://maven.generations.gg/releases")
+    maven("https://jitpack.io")
 }
 
 dependencies {
-    implementation("gg.generations:RareCandy:2.3.6-SNAPSHOT")
+    implementation("gg.generations:RareCandy:3.0.0-SNAPSHOT")
 }
