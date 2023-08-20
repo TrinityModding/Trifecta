@@ -55,7 +55,6 @@ public class Window implements Closeable {
 
         while (!glfwWindowShouldClose(pWindow)) {
             newFrame();
-            action.render(this);
             uiRenderer.render(ctx, width, height);
 
             try (var stack = stackPush()) {
@@ -72,7 +71,8 @@ public class Window implements Closeable {
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            uiRenderer.glRender(width, height, fboWidth, fboHeight);
+            action.render(this);
+//            uiRenderer.glRender(width, height, fboWidth, fboHeight);
             glfwSwapBuffers(pWindow);
         }
 

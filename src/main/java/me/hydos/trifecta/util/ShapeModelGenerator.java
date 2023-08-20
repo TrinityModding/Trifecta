@@ -13,7 +13,7 @@ public class ShapeModelGenerator {
 
     public static Model createCylinder(ShaderProgram shader) {
         var mesh = par_shapes_create_cylinder(3, 1);
-        if(mesh == null) throw new RuntimeException("Failed to generate model");
+        if (mesh == null) throw new RuntimeException("Failed to generate model");
 
         // Vertex Buffer
         var vertexCount = mesh.npoints();
@@ -35,9 +35,15 @@ public class ShapeModelGenerator {
 
         // Index Buffer
         var idxCount = mesh.ntriangles();
-        var indexBuffer = mesh.triangles(idxCount * 3);
+        var srcIdxBuffer = mesh.triangles(idxCount * 3);
+        var idxBuffer = MemoryUtil.memAlloc(idxCount * Short.BYTES);
+        for (int i = 0; i < idxCount; i++) idxBuffer.putShort((short) srcIdxBuffer.get());
+        idxBuffer.flip();
+
+        // Free mesh data
+        mesh.free();
 
         var vertexData = new VertexData(vertexBuffer, List.of(Attribute.POSITION, Attribute.NORMAL, Attribute.COLOR));
-        return new Model(new RenderData(DrawMode.TRIANGLES, vertexData, MemoryUtil.memByteBuffer(indexBuffer), IndexType.UNSIGNED_INT, idxCount), shader);
+        return new Model(new RenderData(DrawMode.TRIANGLES, vertexData, MemoryUtil.memSlice(idxBuffer), IndexType.UNSIGNED_SHORT, idxCount), shader);
     }
 }

@@ -14,6 +14,9 @@ import org.lwjgl.system.Configuration;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import static org.lwjgl.opengl.GL11C.GL_DEPTH;
+import static org.lwjgl.opengl.GL11C.glEnable;
+
 public class Main {
     private static final RareCandyScene SCENE = new RareCandyScene();
     private static final DefaultRenderGraph GRAPH = new DefaultRenderGraph(SCENE);
@@ -49,7 +52,10 @@ public class Main {
         };
 
         SCENE.addInstance(instance);
-        window.run(w -> GRAPH.render());
+        window.run(w -> {
+            glEnable(GL_DEPTH);
+            GRAPH.render();
+        });
     }
 
     private static Matrix4f calculateProjection(Window window) {
@@ -65,7 +71,7 @@ public class Main {
     }
 
     static {
-        // System.loadLibrary("renderdoc");
+        //System.loadLibrary("renderdoc");
         Configuration.DEBUG_STREAM.set(System.out);
     }
 }
