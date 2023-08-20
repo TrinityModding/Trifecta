@@ -6,6 +6,8 @@ import gg.generations.rarecandy.arceus.model.Model;
 import gg.generations.rarecandy.arceus.model.RenderingInstance;
 import gg.generations.rarecandy.legacy.model.misc.Material;
 import gg.generations.rarecandy.legacy.pipeline.ShaderProgram;
+import me.hydos.trifecta.editor.EditorLogic;
+import me.hydos.trifecta.editor.EditorUi;
 import me.hydos.trifecta.renderer.Window;
 import me.hydos.trifecta.util.ShapeModelGenerator;
 import org.joml.Matrix4f;
@@ -24,6 +26,7 @@ public class Main {
 
     public static void main(String[] args) {
         var window = new Window();
+        var editor = new EditorLogic(window);
 
         var cylinderModel = ShapeModelGenerator.createCylinder(new ShaderProgram.Builder()
                 .shader(getShader("simple.vs"), getShader("simple.fs"))
@@ -56,7 +59,7 @@ public class Main {
             glEnable(GL_DEPTH_TEST);
             instance.getTransform().rotateX((float) Math.toRadians(1f));
             GRAPH.render();
-        });
+        }, editor::update);
     }
 
     private static Matrix4f calculateProjection(Window window) {
@@ -72,7 +75,7 @@ public class Main {
     }
 
     static {
-        System.loadLibrary("renderdoc");
+        // System.loadLibrary("renderdoc");
         Configuration.DEBUG_STREAM.set(System.out);
     }
 }

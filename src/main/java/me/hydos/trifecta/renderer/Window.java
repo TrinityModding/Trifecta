@@ -18,8 +18,9 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window implements Closeable {
-    private final NuklearRenderer uiRenderer;
-    private final long pWindow;
+
+    public final NuklearRenderer uiRenderer;
+    public final long pWindow;
     public int width, height;
     public int fboWidth, fboHeight;
 
@@ -49,13 +50,12 @@ public class Window implements Closeable {
         this.uiRenderer = new NuklearRenderer(pWindow);
     }
 
-    public void run(RenderAction action) {
-        var ctx = uiRenderer.ctx;
+    public void run(RenderAction action, Runnable update) {
         glfwShowWindow(pWindow);
 
         while (!glfwWindowShouldClose(pWindow)) {
             newFrame();
-            uiRenderer.render(ctx, width, height);
+            update.run();
 
             try (var stack = stackPush()) {
                 var width = stack.mallocInt(1);
@@ -66,8 +66,7 @@ public class Window implements Closeable {
                 this.width = width.get(0);
                 this.height = height.get(0);
 
-                var bg = uiRenderer.editorUi.clearCol;
-                glClearColor(bg.r(), bg.g(), bg.b(), bg.a());
+                glClearColor(0.15f, 0.27f, 0.36f, 1);
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

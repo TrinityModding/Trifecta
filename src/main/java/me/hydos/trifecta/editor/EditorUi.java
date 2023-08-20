@@ -1,4 +1,4 @@
-package me.hydos.trifecta.renderer;
+package me.hydos.trifecta.editor;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.nuklear.*;
@@ -100,12 +100,11 @@ public class EditorUi {
                 nk_layout_row_dynamic(ctx, 25, 1);
                 if (nk_combo_begin_color(ctx, nk_rgb_cf(clearCol, NkColor.malloc(stack)), NkVec2.malloc(stack).set(nk_widget_width(ctx), 400))) {
                     nk_layout_row_dynamic(ctx, 120, 1);
-                    nk_color_picker(ctx, clearCol, NK_RGBA);
+                    nk_color_picker(ctx, clearCol, NK_RGB);
                     nk_layout_row_dynamic(ctx, 25, 1);
                     clearCol.r(nk_propertyf(ctx, "#R:", 0, clearCol.r(), 1.0f, 0.01f, 0.005f))
                             .g(nk_propertyf(ctx, "#G:", 0, clearCol.g(), 1.0f, 0.01f, 0.005f))
-                            .b(nk_propertyf(ctx, "#B:", 0, clearCol.b(), 1.0f, 0.01f, 0.005f))
-                            .a(nk_propertyf(ctx, "#A:", 0, clearCol.a(), 1.0f, 0.01f, 0.005f));
+                            .b(nk_propertyf(ctx, "#B:", 0, clearCol.b(), 1.0f, 0.01f, 0.005f));
                     nk_combo_end(ctx);
                 }
             }

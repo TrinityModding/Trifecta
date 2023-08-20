@@ -1,5 +1,6 @@
 package me.hydos.trifecta.renderer;
 
+import me.hydos.trifecta.editor.EditorUi;
 import me.hydos.trifecta.util.IOUtil;
 import org.lwjgl.nuklear.*;
 import org.lwjgl.stb.STBTTAlignedQuad;
@@ -30,7 +31,6 @@ public class NuklearRenderer implements Closeable {
     private static final int MAX_ELEMENT_BUFFER = 128 * 1024;
     public final NkAllocator allocator;
     public final NkDrawVertexLayoutElement.Buffer vertexLayout;
-    public final EditorUi editorUi = new EditorUi();
     public final NkContext ctx = NkContext.create();
     public final NkUserFont font = NkUserFont.create();
     public final NkBuffer cmds = NkBuffer.create();
@@ -263,10 +263,6 @@ public class NuklearRenderer implements Closeable {
         nk_style_set_font(ctx, font);
     }
 
-    public void render(NkContext ctx, int width, int height) {
-        editorUi.render(ctx, width, height);
-    }
-
     /**
      * IMPORTANT: `nk_glfw_render` modifies some global OpenGL state
      * with blending, scissor, face culling, depth test and viewport and
@@ -415,17 +411,11 @@ public class NuklearRenderer implements Closeable {
                 var x = (int) cx.get(0);
                 var y = (int) cy.get(0);
 
-                int nkButton;
-                switch (button) {
-                    case GLFW_MOUSE_BUTTON_RIGHT:
-                        nkButton = NK_BUTTON_RIGHT;
-                        break;
-                    case GLFW_MOUSE_BUTTON_MIDDLE:
-                        nkButton = NK_BUTTON_MIDDLE;
-                        break;
-                    default:
-                        nkButton = NK_BUTTON_LEFT;
-                }
+                int nkButton = switch (button) {
+                    case GLFW_MOUSE_BUTTON_RIGHT -> NK_BUTTON_RIGHT;
+                    case GLFW_MOUSE_BUTTON_MIDDLE -> NK_BUTTON_MIDDLE;
+                    default -> NK_BUTTON_LEFT;
+                };
                 nk_input_button(ctx, nkButton, x, y, action == GLFW_PRESS);
             }
         });
