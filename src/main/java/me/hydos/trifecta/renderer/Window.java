@@ -94,8 +94,6 @@ public class Window implements Closeable {
             fboWidth = w.get(0);
             fboHeight = h.get(0);
         }
-
-        uiRenderer.handleInput(pWindow);
     }
 
     private void onGlError(int glSource, int glType, int id, int severity, int length, long pMessage, long userParam) {

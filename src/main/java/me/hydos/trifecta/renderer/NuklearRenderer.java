@@ -1,6 +1,5 @@
 package me.hydos.trifecta.renderer;
 
-import me.hydos.trifecta.editor.EditorUi;
 import me.hydos.trifecta.util.IOUtil;
 import org.lwjgl.nuklear.*;
 import org.lwjgl.stb.STBTTAlignedQuad;
@@ -445,7 +444,6 @@ public class NuklearRenderer implements Closeable {
 
     @Override
     public void close() {
-        System.out.println("Closing");
         // Nk objects
         Objects.requireNonNull(ctx.clip().copy()).free();
         Objects.requireNonNull(ctx.clip().paste()).free();
