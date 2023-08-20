@@ -3,9 +3,12 @@ package me.hydos.trifecta.editor;
 import me.hydos.trifecta.renderer.Window;
 import me.hydos.trifecta.util.EditorCamera;
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFWDropCallback;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.DoubleBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -23,15 +26,26 @@ public class EditorLogic {
         glfwSetKeyCallback(window.pWindow, this::handleKeyboardInput);
         glfwSetMouseButtonCallback(window.pWindow, this::handleMouseInput);
         glfwSetScrollCallback(window.pWindow, this::handleMouseScroll);
+        glfwSetDropCallback(window.pWindow, this::handleFileDrop);
     }
 
-    private void handleKeyboardInput(long window, int key, int scancode, int action, int mods) {
+    private void handleFileDrop(long pWindow, int count, long names) {
+        for (int i = 0; i < count; i++) {
+            var path = Paths.get(GLFWDropCallback.getName(names, i));
+            handleFile(path);
+        }
+    }
+
+    private void handleFile(Path path) {
+        System.out.println("Opening File " + path);
+    }
+
+    private void handleKeyboardInput(long pWindow, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_LEFT_SHIFT)
             shiftDown = (action == GLFW_PRESS || action == GLFW_REPEAT) && (shiftDown || !isDragging);
     }
 
     // Called every frame. Aim for < 2ms
-
     public void update() {
         window.uiRenderer.handleInput(window.pWindow);
         ui.render(window.uiRenderer.ctx, window.width, window.height);
