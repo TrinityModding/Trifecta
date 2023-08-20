@@ -30,14 +30,10 @@ public class EditorLogic {
     }
 
     private void handleFileDrop(long pWindow, int count, long names) {
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             var path = Paths.get(GLFWDropCallback.getName(names, i));
-            handleFile(path);
+            FileImporter.handleFile(path, this);
         }
-    }
-
-    private void handleFile(Path path) {
-        System.out.println("Opening File " + path);
     }
 
     private void handleKeyboardInput(long pWindow, int key, int scancode, int action, int mods) {
