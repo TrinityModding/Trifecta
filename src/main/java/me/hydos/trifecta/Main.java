@@ -14,8 +14,7 @@ import org.lwjgl.system.Configuration;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static org.lwjgl.opengl.GL11C.GL_DEPTH;
-import static org.lwjgl.opengl.GL11C.glEnable;
+import static org.lwjgl.opengl.GL11C.*;
 
 public class Main {
     private static final RareCandyScene SCENE = new RareCandyScene();
@@ -34,6 +33,7 @@ public class Main {
                 .build()
         );
         var instance = new RenderingInstance() {
+            private final Matrix4f transform = new Matrix4f();
 
             @Override
             public Model getModel() {
@@ -47,13 +47,14 @@ public class Main {
 
             @Override
             public Matrix4f getTransform() {
-                return new Matrix4f();
+                return transform;
             }
         };
 
         SCENE.addInstance(instance);
         window.run(w -> {
-            glEnable(GL_DEPTH);
+            glEnable(GL_DEPTH_TEST);
+            instance.getTransform().rotateX((float) Math.toRadians(1f));
             GRAPH.render();
         });
     }
@@ -71,7 +72,7 @@ public class Main {
     }
 
     static {
-        //System.loadLibrary("renderdoc");
+        System.loadLibrary("renderdoc");
         Configuration.DEBUG_STREAM.set(System.out);
     }
 }

@@ -72,7 +72,7 @@ public class Window implements Closeable {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             action.render(this);
-//            uiRenderer.glRender(width, height, fboWidth, fboHeight);
+            uiRenderer.glRender(width, height, fboWidth, fboHeight);
             glfwSwapBuffers(pWindow);
         }
 
