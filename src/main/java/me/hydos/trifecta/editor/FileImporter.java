@@ -168,7 +168,7 @@ public class FileImporter {
                 }
 
                 throw new RuntimeException("MISSING SHADER CODE :(");
-                new MeshBatch(null, new RenderData(DrawMode.TRIANGLES, new VertexData(vertexBuffer, rarecandyAttribs), idxBuffer.bufferAsByteBuffer(), rareCandyIndexLayout, -1), subMeshes);
+//                model.meshes.add(new MeshBatch(null, new RenderData(DrawMode.TRIANGLES, new VertexData(vertexBuffer, rarecandyAttribs), idxBuffer.bufferAsByteBuffer(), rareCandyIndexLayout, -1), subMeshes));
             }
         }
 
