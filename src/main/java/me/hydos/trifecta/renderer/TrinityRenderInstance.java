@@ -3,19 +3,18 @@ package me.hydos.trifecta.renderer;
 import gg.generations.rarecandy.arceus.model.Model;
 import gg.generations.rarecandy.arceus.model.RenderingInstance;
 import gg.generations.rarecandy.legacy.model.misc.Material;
-import me.hydos.trifecta.trinity.MeshBatch;
 import org.joml.Matrix4f;
 
 public class TrinityRenderInstance implements RenderingInstance {
 
     public final Matrix4f transform = new Matrix4f();
-    private final MeshBatch model;
+    private final me.hydos.trifecta.type.Model model;
 
-    public TrinityRenderInstance(MeshBatch model) {
+    public TrinityRenderInstance(me.hydos.trifecta.type.Model model) {
         this.model = model;
     }
 
-    public MeshBatch getTrinityModel() {
+    public me.hydos.trifecta.type.Model getTrinityModel() {
         return model;
     }
 

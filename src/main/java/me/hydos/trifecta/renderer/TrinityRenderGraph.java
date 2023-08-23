@@ -4,7 +4,7 @@ import gg.generations.rarecandy.arceus.core.RareCandyScene;
 import gg.generations.rarecandy.arceus.model.RenderingInstance;
 import gg.generations.rarecandy.arceus.model.SmartObject;
 import gg.generations.rarecandy.legacy.pipeline.ShaderProgram;
-import me.hydos.trifecta.trinity.MeshBatch;
+import me.hydos.trifecta.type.Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ public class TrinityRenderGraph {
 
     private final RareCandyScene<TrinityRenderInstance> scene;
     private final List<SmartObject> updatableObjects = new ArrayList<>();
-    private final Map<ShaderProgram, Map<MeshBatch, List<RenderingInstance>>> instanceMap = new HashMap<>();
+    private final Map<ShaderProgram, Map<Model, List<RenderingInstance>>> instanceMap = new HashMap<>();
 
     public TrinityRenderGraph(RareCandyScene<TrinityRenderInstance> scene) {
         this.scene = scene;
@@ -34,13 +34,16 @@ public class TrinityRenderGraph {
 
             for (var modelEntry : shaderEntry.getValue().entrySet()) {
                 var model = modelEntry.getKey();
-                model.bind();
+
 
                 for (var instance : modelEntry.getValue()) {
                     program.updateInstanceUniforms(instance, null); // FIXME: i wonder how i can better handle shaders here...
 
-                    for (var meshGroup : model.meshes())
-                        glDrawElements(model.renderData().mode.glType, (int) meshGroup.idxCount(), model.renderData().indexType.glType, (int) meshGroup.idxOffset());
+                    for (var meshBatch : model.meshes) {
+                        meshBatch.bind();
+                        for (var mesh : meshBatch.meshes())
+                            glDrawElements(meshBatch.renderData().mode.glType, (int) mesh.idxCount(), meshBatch.renderData().indexType.glType, (int) mesh.idxOffset());
+                    }
                 }
             }
         }
@@ -57,14 +60,14 @@ public class TrinityRenderGraph {
 
     private void addInstance(TrinityRenderInstance instance) {
         if (instance instanceof SmartObject object) updatableObjects.add(object);
-        instanceMap.computeIfAbsent(instance.getTrinityModel().shader(), layout -> new HashMap<>())
+        instanceMap.computeIfAbsent(instance.getTrinityModel().meshes.get(0).shader(), layout -> new HashMap<>())
                 .computeIfAbsent(instance.getTrinityModel(), shaderProgram -> new ArrayList<>())
                 .add(instance);
     }
 
     private void removeInstance(TrinityRenderInstance instance) {
         if (instance instanceof SmartObject) updatableObjects.remove(instance);
-        instanceMap.get(instance.getTrinityModel().shader())
+        instanceMap.get(instance.getTrinityModel().meshes.get(0).shader())
                 .get(instance.getTrinityModel())
                 .remove(instance);
     }

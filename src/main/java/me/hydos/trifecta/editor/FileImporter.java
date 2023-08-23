@@ -5,7 +5,9 @@ import gg.generations.rarecandy.arceus.model.lowlevel.DrawMode;
 import gg.generations.rarecandy.arceus.model.lowlevel.IndexType;
 import gg.generations.rarecandy.arceus.model.lowlevel.RenderData;
 import gg.generations.rarecandy.arceus.model.lowlevel.VertexData;
+import me.hydos.trifecta.Main;
 import me.hydos.trifecta.flatbuffers.Titan.Model.*;
+import me.hydos.trifecta.renderer.TrinityRenderInstance;
 import me.hydos.trifecta.trinity.MeshBatch;
 import me.hydos.trifecta.type.Model;
 import org.joml.Matrix4f;
@@ -168,8 +170,10 @@ public class FileImporter {
                 }
 
                 throw new RuntimeException("MISSING SHADER CODE :(");
-//                model.meshes.add(new MeshBatch(null, new RenderData(DrawMode.TRIANGLES, new VertexData(vertexBuffer, rarecandyAttribs), idxBuffer.bufferAsByteBuffer(), rareCandyIndexLayout, -1), subMeshes));
+                model.meshes.add(new MeshBatch(null, new RenderData(DrawMode.TRIANGLES, new VertexData(vertexBuffer, rarecandyAttribs), idxBuffer.bufferAsByteBuffer(), rareCandyIndexLayout, -1), subMeshes));
             }
+
+            Main.SCENE.addInstance(new TrinityRenderInstance(model));
         }
 
         // Skeleton
