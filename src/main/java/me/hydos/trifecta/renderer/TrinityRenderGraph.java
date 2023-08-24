@@ -34,8 +34,7 @@ public class TrinityRenderGraph {
 
             for (var modelEntry : shaderEntry.getValue().entrySet()) {
                 var model = modelEntry.getKey();
-
-
+                
                 for (var instance : modelEntry.getValue()) {
                     program.updateInstanceUniforms(instance, null); // FIXME: i wonder how i can better handle shaders here...
 

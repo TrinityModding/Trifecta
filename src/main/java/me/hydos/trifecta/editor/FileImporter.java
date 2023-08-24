@@ -13,6 +13,7 @@ import me.hydos.trifecta.type.Model;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import static org.lwjgl.opengl.GL30C.GL_HALF_FLOAT;
 
 public class FileImporter {
 
-    private static void importModel(Path path, EditorLogic editor) {
+    private static void importModel(Path path) {
         var parentDir = path.getParent();
         var trmdl = TRMDL.getRootAsTRMDL(read(path));
         var trskl = TRSKL.getRootAsTRSKL(read(parentDir.resolve(Objects.requireNonNull(trmdl.skeleton().filename()))));
@@ -47,8 +48,8 @@ public class FileImporter {
             for (int meshIdx = 0; meshIdx < entry.getKey().meshesLength(); meshIdx++) {
                 var info = entry.getKey().meshes(meshIdx);
                 var data = entry.getValue().buffers(meshIdx);
-                var vertexBuffer = data.vertexBuffer(0).bufferAsByteBuffer();
-                var idxBuffer = data.indexBuffer(0);
+                var vertexBuffer = flatBufferToMem(data.vertexBuffer(0).bufferAsByteBuffer(), data.vertexBuffer(0).bufferLength());
+                var idxBuffer = flatBufferToMem(data.indexBuffer(0).bufferAsByteBuffer(), data.indexBuffer(0).bufferLength());
 
                 enum IndexLayout {
                     UINT8(Byte.BYTES),
@@ -72,7 +73,8 @@ public class FileImporter {
                     case UINT8 -> IndexType.UNSIGNED_BYTE;
                     case UINT16 -> IndexType.UNSIGNED_SHORT;
                     case UINT32 -> IndexType.UNSIGNED_INT;
-                    case UINT64 -> throw new RuntimeException("What the fuck how big is this model damn 💀💀 change your index type from int64 your indices are blow 2_147_483_647 most likely");
+                    case UINT64 ->
+                            throw new RuntimeException("What the fuck how big is this model damn 💀💀 change your index type from int64 your indices are blow 2_147_483_647 most likely");
                 };
 
                 var rawAttributes = info.attributes(0);
@@ -120,12 +122,8 @@ public class FileImporter {
                     }
                 }
 
-                record Attribute(
-                        AttributeType type,
-                        AttributeSize size
-                ) {
+                record Attribute(AttributeType type, AttributeSize size) {
                 }
-
                 var svAttribs = new ArrayList<Attribute>();
                 for (var j = 0; j < rawAttributes.attrsLength(); j++) {
                     svAttribs.add(new Attribute(
@@ -136,8 +134,7 @@ public class FileImporter {
 
                 var rarecandyAttribs = svAttribs.stream().map(attribute -> {
                     var glType = switch (attribute.size) {
-                        case NONE ->
-                                throw new RuntimeException("Trinity model with NONE attribute found. Import failed");
+                        case NONE -> throw new RuntimeException("Invalid attrib NONE");
                         case RGBA_8_UNORM, RGBA_8_UNSIGNED -> GL_UNSIGNED_BYTE;
                         case R32_UINT -> GL_UNSIGNED_INT;
                         case R32_INT -> GL_INT;
@@ -147,8 +144,7 @@ public class FileImporter {
                     };
 
                     var amount = switch (attribute.size) {
-                        case NONE ->
-                                throw new RuntimeException("Trinity model with NONE attribute found. Import failed");
+                        case NONE -> throw new RuntimeException("Invalid attrib NONE");
                         case RGBA_8_UNORM, RGBA_8_UNSIGNED, RGBA_32_FLOAT, RGBA_16_FLOAT, RGBA_16_UNORM -> 4;
                         case RGB_32_FLOAT -> 3;
                         case RG_32_FLOAT -> 2;
@@ -169,8 +165,7 @@ public class FileImporter {
                     subMeshes.add(new MeshBatch.SubMesh(indexOffset, indexCount, material));
                 }
 
-                throw new RuntimeException("MISSING SHADER CODE :(");
-                model.meshes.add(new MeshBatch(null, new RenderData(DrawMode.TRIANGLES, new VertexData(vertexBuffer, rarecandyAttribs), idxBuffer.bufferAsByteBuffer(), rareCandyIndexLayout, -1), subMeshes));
+                model.meshes.add(new MeshBatch(Main.POKEMON_SIMPLE, new RenderData(DrawMode.TRIANGLES, new VertexData(vertexBuffer, rarecandyAttribs), idxBuffer, rareCandyIndexLayout, -1), subMeshes));
             }
 
             Main.SCENE.addInstance(new TrinityRenderInstance(model));
@@ -213,6 +208,12 @@ public class FileImporter {
         System.out.println("Trinity Model imported");
     }
 
+    private static ByteBuffer flatBufferToMem(ByteBuffer bb, int length) {
+        var nativeBb = MemoryUtil.memAlloc(length);
+        nativeBb.put(bb);
+        return nativeBb.flip();
+    }
+
     private static Optional<TRMMT> locateTrmmt(Path parent, String trmdlPath) {
         var possiblePath = parent.resolve(trmdlPath.replace("trmtr", "trmmt"));
         if (Files.exists(possiblePath)) return Optional.of(TRMMT.getRootAsTRMMT(read(possiblePath)));
@@ -224,7 +225,7 @@ public class FileImporter {
         var extension = getFileExtension(path);
 
         switch (extension) {
-            case "trmdl" -> importModel(path, editor);
+            case "trmdl" -> importModel(path);
             // TODO: data files
             // TODO: scene formats
             default ->

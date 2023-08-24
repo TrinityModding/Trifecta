@@ -1,15 +1,11 @@
 package me.hydos.trifecta;
 
 import gg.generations.rarecandy.arceus.core.RareCandyScene;
-import gg.generations.rarecandy.arceus.model.Model;
-import gg.generations.rarecandy.arceus.model.RenderingInstance;
-import gg.generations.rarecandy.legacy.model.misc.Material;
 import gg.generations.rarecandy.legacy.pipeline.ShaderProgram;
 import me.hydos.trifecta.editor.EditorLogic;
 import me.hydos.trifecta.renderer.TrinityRenderGraph;
 import me.hydos.trifecta.renderer.TrinityRenderInstance;
 import me.hydos.trifecta.renderer.Window;
-import me.hydos.trifecta.util.ShapeModelGenerator;
 import org.joml.Matrix4f;
 import org.lwjgl.system.Configuration;
 
@@ -22,13 +18,14 @@ import static org.lwjgl.opengl.GL11C.glEnable;
 public class Main {
     public static final RareCandyScene<TrinityRenderInstance> SCENE = new RareCandyScene<>();
     private static final TrinityRenderGraph GRAPH = new TrinityRenderGraph(SCENE);
+    public static ShaderProgram POKEMON_SIMPLE;
     private static final int FOV = 90;
 
     public static void main(String[] args) {
         var window = new Window();
         var editor = new EditorLogic(window);
 
-        var simpleShader = new ShaderProgram.Builder()
+        POKEMON_SIMPLE = new ShaderProgram.Builder()
                 .shader(getShader("simple.vs"), getShader("simple.fs"))
                 .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
                 .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
@@ -54,7 +51,7 @@ public class Main {
     }
 
     static {
-        // System.loadLibrary("renderdoc");
+        System.loadLibrary("renderdoc");
         Configuration.DEBUG_STREAM.set(System.out);
     }
 }

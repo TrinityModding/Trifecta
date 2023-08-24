@@ -19,7 +19,8 @@ public record MeshBatch(ShaderProgram shader, RenderData renderData, List<SubMes
 
     @Override
     public void bind() {
-        throw new RuntimeException("make sure i do this");
+        renderData.vertexData.bind();
+        renderData.bind();
     }
 
     @Override
