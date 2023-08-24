@@ -32,8 +32,8 @@ lwjgl3 {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
+    maven("https://maven.generations.gg/snapshots")
     maven("https://maven.generations.gg/releases")
     maven("https://jitpack.io")
 }
