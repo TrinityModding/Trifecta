@@ -23,9 +23,6 @@ public class EditorLogic {
 
     public EditorLogic(Window window) {
         this.window = window;
-        glfwSetKeyCallback(window.pWindow, this::handleKeyboardInput);
-        glfwSetMouseButtonCallback(window.pWindow, this::handleMouseInput);
-        glfwSetScrollCallback(window.pWindow, this::handleMouseScroll);
         glfwSetDropCallback(window.pWindow, this::handleFileDrop);
     }
 
@@ -36,7 +33,7 @@ public class EditorLogic {
         }
     }
 
-    private void handleKeyboardInput(long pWindow, int key, int scancode, int action, int mods) {
+    public void handleKeyboardInput(long pWindow, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_LEFT_SHIFT)
             shiftDown = (action == GLFW_PRESS || action == GLFW_REPEAT) && (shiftDown || !isDragging);
     }
@@ -50,11 +47,11 @@ public class EditorLogic {
         if (isDragging) CAMERA.onMouseDragged(mouseX.get(0), mouseY.get(0), shiftDown);
     }
 
-    private void handleMouseScroll(long pWindow, double xOffset, double yOffset) {
+    public void handleMouseScroll(long pWindow, double xOffset, double yOffset) {
         CAMERA.onMouseScrolled(-yOffset);
     }
 
-    private void handleMouseInput(long pWindow, int key, int action, int mods) {
+    public void handleMouseInput(long pWindow, int key, int action, int mods) {
         switch (key) {
             case GLFW_MOUSE_BUTTON_MIDDLE -> {
                 this.isDragging = action == GLFW_PRESS;

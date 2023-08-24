@@ -3,15 +3,20 @@ package me.hydos.trifecta;
 import gg.generations.rarecandy.arceus.core.RareCandyScene;
 import gg.generations.rarecandy.legacy.pipeline.ShaderProgram;
 import me.hydos.trifecta.editor.EditorLogic;
+import me.hydos.trifecta.editor.EditorUi;
 import me.hydos.trifecta.renderer.TrinityRenderGraph;
 import me.hydos.trifecta.renderer.TrinityRenderInstance;
 import me.hydos.trifecta.renderer.Window;
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFWKeyCallbackI;
+import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
+import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.system.Configuration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11C.glEnable;
 
@@ -24,6 +29,7 @@ public class Main {
     public static void main(String[] args) {
         var window = new Window();
         var editor = new EditorLogic(window);
+        setUpSharedGLFWCallbacks(window, editor);
 
         POKEMON_SIMPLE = new ShaderProgram.Builder()
                 .shader(getShader("simple.vs"), getShader("simple.fs"))
@@ -36,6 +42,24 @@ public class Main {
             glEnable(GL_DEPTH_TEST);
             GRAPH.render();
         }, editor::update);
+    }
+
+    private static void setUpSharedGLFWCallbacks(Window window, EditorLogic editorLogic) {
+        glfwSetScrollCallback(window.pWindow, (long windowP, double xoffset, double yoffset) -> {
+            window.uiRenderer.onScroll(windowP, xoffset, yoffset);
+            editorLogic.handleMouseScroll(windowP, xoffset, yoffset);
+        });
+
+        glfwSetKeyCallback(window.pWindow, (pWindow, key, scancode, action, mods) -> {
+           window.uiRenderer.onKey(pWindow, key, scancode, action, mods);
+           editorLogic.handleKeyboardInput(pWindow, key, scancode, action, mods);
+        });
+
+        glfwSetMouseButtonCallback(window.pWindow, (window1, button, action, mods) -> {
+            window.uiRenderer.mouseClick(window1, button, action, mods);
+            editorLogic.handleMouseInput(window1, button, action, mods);
+        });
+
     }
 
     private static Matrix4f calculateProjection(Window window) {

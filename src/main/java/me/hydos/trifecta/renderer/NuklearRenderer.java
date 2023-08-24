@@ -348,76 +348,9 @@ public class NuklearRenderer implements Closeable {
     }
 
     public void createContext(long win) {
-        glfwSetScrollCallback(win, (window, xoffset, yoffset) -> {
-            try (var stack = stackPush()) {
-                var scroll = NkVec2.malloc(stack).x((float) xoffset).y((float) yoffset);
-                nk_input_scroll(ctx, scroll);
-            }
-        });
-        glfwSetCharCallback(win, (window, codepoint) -> nk_input_unicode(ctx, codepoint));
-        glfwSetKeyCallback(win, (window, key, scancode, action, mods) -> {
-            var press = action == GLFW_PRESS;
-            switch (key) {
-                case GLFW_KEY_ESCAPE -> glfwSetWindowShouldClose(window, true);
-                case GLFW_KEY_DELETE -> nk_input_key(ctx, NK_KEY_DEL, press);
-                case GLFW_KEY_ENTER -> nk_input_key(ctx, NK_KEY_ENTER, press);
-                case GLFW_KEY_TAB -> nk_input_key(ctx, NK_KEY_TAB, press);
-                case GLFW_KEY_BACKSPACE -> nk_input_key(ctx, NK_KEY_BACKSPACE, press);
-                case GLFW_KEY_UP -> nk_input_key(ctx, NK_KEY_UP, press);
-                case GLFW_KEY_DOWN -> nk_input_key(ctx, NK_KEY_DOWN, press);
-                case GLFW_KEY_HOME -> {
-                    nk_input_key(ctx, NK_KEY_TEXT_START, press);
-                    nk_input_key(ctx, NK_KEY_SCROLL_START, press);
-                }
-                case GLFW_KEY_END -> {
-                    nk_input_key(ctx, NK_KEY_TEXT_END, press);
-                    nk_input_key(ctx, NK_KEY_SCROLL_END, press);
-                }
-                case GLFW_KEY_PAGE_DOWN -> nk_input_key(ctx, NK_KEY_SCROLL_DOWN, press);
-                case GLFW_KEY_PAGE_UP -> nk_input_key(ctx, NK_KEY_SCROLL_UP, press);
-                case GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> nk_input_key(ctx, NK_KEY_SHIFT, press);
-                case GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> {
-                    if (press) {
-                        nk_input_key(ctx, NK_KEY_COPY, glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_PASTE, glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_CUT, glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_TEXT_UNDO, glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_TEXT_REDO, glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_TEXT_LINE_START, glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_TEXT_LINE_END, glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
-                    } else {
-                        nk_input_key(ctx, NK_KEY_LEFT, glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_RIGHT, glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
-                        nk_input_key(ctx, NK_KEY_COPY, false);
-                        nk_input_key(ctx, NK_KEY_PASTE, false);
-                        nk_input_key(ctx, NK_KEY_CUT, false);
-                        nk_input_key(ctx, NK_KEY_SHIFT, false);
-                    }
-                }
-            }
-        });
+        glfwSetCharCallback(win, this::onChar);
 
-        glfwSetCursorPosCallback(win, (window, xpos, ypos) -> nk_input_motion(ctx, (int) xpos, (int) ypos));
-        glfwSetMouseButtonCallback(win, (window, button, action, mods) -> {
-            try (var stack = stackPush()) {
-                var cx = stack.mallocDouble(1);
-                var cy = stack.mallocDouble(1);
-
-                glfwGetCursorPos(window, cx, cy);
-
-                var x = (int) cx.get(0);
-                var y = (int) cy.get(0);
-
-                int nkButton = switch (button) {
-                    case GLFW_MOUSE_BUTTON_RIGHT -> NK_BUTTON_RIGHT;
-                    case GLFW_MOUSE_BUTTON_MIDDLE -> NK_BUTTON_MIDDLE;
-                    default -> NK_BUTTON_LEFT;
-                };
-                nk_input_button(ctx, nkButton, x, y, action == GLFW_PRESS);
-            }
-        });
+        glfwSetCursorPosCallback(win, this::onCursorPos);
 
         nk_init(ctx, allocator, null);
         ctx.clip().copy((handle, text, len) -> {
@@ -467,5 +400,83 @@ public class NuklearRenderer implements Closeable {
 
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);
+    }
+
+    public void onKey(long window, int key, int scancode, int action, int mods) {
+        var press = action == GLFW_PRESS;
+        switch (key) {
+            case GLFW_KEY_ESCAPE -> glfwSetWindowShouldClose(window, true);
+            case GLFW_KEY_DELETE -> nk_input_key(ctx, NK_KEY_DEL, press);
+            case GLFW_KEY_ENTER -> nk_input_key(ctx, NK_KEY_ENTER, press);
+            case GLFW_KEY_TAB -> nk_input_key(ctx, NK_KEY_TAB, press);
+            case GLFW_KEY_BACKSPACE -> nk_input_key(ctx, NK_KEY_BACKSPACE, press);
+            case GLFW_KEY_UP -> nk_input_key(ctx, NK_KEY_UP, press);
+            case GLFW_KEY_DOWN -> nk_input_key(ctx, NK_KEY_DOWN, press);
+            case GLFW_KEY_HOME -> {
+                nk_input_key(ctx, NK_KEY_TEXT_START, press);
+                nk_input_key(ctx, NK_KEY_SCROLL_START, press);
+            }
+            case GLFW_KEY_END -> {
+                nk_input_key(ctx, NK_KEY_TEXT_END, press);
+                nk_input_key(ctx, NK_KEY_SCROLL_END, press);
+            }
+            case GLFW_KEY_PAGE_DOWN -> nk_input_key(ctx, NK_KEY_SCROLL_DOWN, press);
+            case GLFW_KEY_PAGE_UP -> nk_input_key(ctx, NK_KEY_SCROLL_UP, press);
+            case GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT -> nk_input_key(ctx, NK_KEY_SHIFT, press);
+            case GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL -> {
+                if (press) {
+                    nk_input_key(ctx, NK_KEY_COPY, glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_PASTE, glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_CUT, glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_TEXT_UNDO, glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_TEXT_REDO, glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_TEXT_LINE_START, glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_TEXT_LINE_END, glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
+                } else {
+                    nk_input_key(ctx, NK_KEY_LEFT, glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_RIGHT, glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+                    nk_input_key(ctx, NK_KEY_COPY, false);
+                    nk_input_key(ctx, NK_KEY_PASTE, false);
+                    nk_input_key(ctx, NK_KEY_CUT, false);
+                    nk_input_key(ctx, NK_KEY_SHIFT, false);
+                }
+            }
+        }
+    }
+
+    public void mouseClick(long window, int button, int action, int mods) {
+        try (var stack = stackPush()) {
+            var cx = stack.mallocDouble(1);
+            var cy = stack.mallocDouble(1);
+
+            glfwGetCursorPos(window, cx, cy);
+
+            var x = (int) cx.get(0);
+            var y = (int) cy.get(0);
+
+            int nkButton = switch (button) {
+                case GLFW_MOUSE_BUTTON_RIGHT -> NK_BUTTON_RIGHT;
+                case GLFW_MOUSE_BUTTON_MIDDLE -> NK_BUTTON_MIDDLE;
+                default -> NK_BUTTON_LEFT;
+            };
+            nk_input_button(ctx, nkButton, x, y, action == GLFW_PRESS);
+        }
+    }
+
+    public void onScroll(long window, double xoffset, double yoffset) {
+        try (var stack = stackPush()) {
+            var scroll = NkVec2.malloc(stack).x((float) xoffset).y((float) yoffset);
+            nk_input_scroll(ctx, scroll);
+        }
+    }
+
+    public void onChar(long window, int codepoint) {
+        nk_input_unicode(ctx, codepoint);
+    }
+
+    public void onCursorPos(long window, double xpos, double ypos) {
+        nk_input_motion(ctx, (int) xpos, (int) ypos);
     }
 }
