@@ -43,4 +43,5 @@ dependencies {
 
     implementation("org.joml", "joml", "1.10.5")
     implementation("gg.generations:RareCandy:3.0.0-SNAPSHOT")
+    implementation(files("libs/dds-lwjgl-2.1.0.jar"))
 }

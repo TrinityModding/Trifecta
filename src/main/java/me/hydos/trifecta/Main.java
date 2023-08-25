@@ -3,18 +3,15 @@ package me.hydos.trifecta;
 import gg.generations.rarecandy.arceus.core.RareCandyScene;
 import gg.generations.rarecandy.legacy.pipeline.ShaderProgram;
 import me.hydos.trifecta.editor.EditorLogic;
-import me.hydos.trifecta.editor.EditorUi;
 import me.hydos.trifecta.renderer.TrinityRenderGraph;
 import me.hydos.trifecta.renderer.TrinityRenderInstance;
 import me.hydos.trifecta.renderer.Window;
 import org.joml.Matrix4f;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
-import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
-import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.system.Configuration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
@@ -26,22 +23,31 @@ public class Main {
     public static ShaderProgram POKEMON_SIMPLE;
     private static final int FOV = 90;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         var window = new Window();
         var editor = new EditorLogic(window);
         setUpSharedGLFWCallbacks(window, editor);
+        try {
+            var texture = new DDSTexture(Path.of("D:\\Git Repos\\Trifecta\\run\\pm0025_00_00_body_a_nrm.dds"));
 
-        POKEMON_SIMPLE = new ShaderProgram.Builder()
-                .shader(getShader("simple.vs"), getShader("simple.fs"))
-                .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
-                .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
-                .supplyUniform(ShaderProgram.Builder.UniformType.INSTANCE, "modelMatrix", ctx -> ctx.uniform().uploadMat4f(ctx.instance().getTransform()))
-                .build();
+            POKEMON_SIMPLE = new ShaderProgram.Builder()
+                    .shader(getShader("simple.vs"), getShader("simple.fs"))
+                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
+                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
+                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "textureSampler", ctx -> {
+                        texture.bind(0);
+                        ctx.uniform().uploadInt(0);
+                    })
+                    .supplyUniform(ShaderProgram.Builder.UniformType.INSTANCE, "modelMatrix", ctx -> ctx.uniform().uploadMat4f(ctx.instance().getTransform()))
+                    .build();
 
-        window.run(w -> {
-            glEnable(GL_DEPTH_TEST);
-            GRAPH.render();
-        }, editor::update);
+            window.run(w -> {
+                glEnable(GL_DEPTH_TEST);
+                GRAPH.render();
+            }, editor::update);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void setUpSharedGLFWCallbacks(Window window, EditorLogic editorLogic) {
