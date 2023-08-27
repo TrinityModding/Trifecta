@@ -3,18 +3,20 @@ package me.hydos.trifecta;
 import gg.generations.rarecandy.arceus.core.RareCandyScene;
 import gg.generations.rarecandy.legacy.pipeline.ShaderProgram;
 import me.hydos.trifecta.editor.EditorLogic;
-import me.hydos.trifecta.editor.EditorUi;
+import me.hydos.trifecta.flatbuffers.Titan.TrinityScene.trinity_ScriptComponentT;
 import me.hydos.trifecta.renderer.TrinityRenderGraph;
 import me.hydos.trifecta.renderer.TrinityRenderInstance;
 import me.hydos.trifecta.renderer.Window;
+import me.hydos.trifecta.trinity.scene.TrinityScene;
 import org.joml.Matrix4f;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
-import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
-import org.lwjgl.glfw.GLFWScrollCallback;
+import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JsePlatform;
 import org.lwjgl.system.Configuration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
@@ -26,7 +28,21 @@ public class Main {
     public static ShaderProgram POKEMON_SIMPLE;
     private static final int FOV = 90;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        var startup0 = TrinityScene.read(Paths.get("F:/PokemonScarlet/arc/world/scene/startup_/startup_0.trscn"));
+        var startupScript = ((trinity_ScriptComponentT) startup0.objects.get(0).children().get(0).data());
+
+        // Create a Lua environment
+        var globals = JsePlatform.standardGlobals();
+
+        // Load and execute the compiled Lua bytecode
+        try {
+            var chunk = globals.loadfile("F:/PokemonScarlet/arc/script/lua/bin/release/main/main.blua");
+            chunk.call();
+        } catch (LuaError e) {
+            System.out.println("Error loading or executing Lua bytecode: " + e.getMessage());
+        }
+
         var window = new Window();
         var editor = new EditorLogic(window);
         setUpSharedGLFWCallbacks(window, editor);

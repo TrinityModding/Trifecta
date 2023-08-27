@@ -14,6 +14,10 @@ java {
     }
 }
 
+sourceSets {
+    create("flatGen")
+}
+
 lwjgl3 {
     targets {
         named("main") {
@@ -39,6 +43,8 @@ repositories {
 }
 
 dependencies {
+    implementation(files("deps/luaj-3.0.3.jar"))
+
     implementation("com.google.flatbuffers", "flatbuffers-java", "23.3.3")
 
     implementation("org.joml", "joml", "1.10.5")

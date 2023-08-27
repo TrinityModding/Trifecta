@@ -31,8 +31,8 @@ public class FileImporter {
         var parentDir = path.getParent();
         var trmdl = TRMDL.getRootAsTRMDL(read(path));
         var trskl = TRSKL.getRootAsTRSKL(read(parentDir.resolve(Objects.requireNonNull(trmdl.skeleton().filename()))));
-        var trmtr = TRMTR.getRootAsTRMTR(read(parentDir.resolve(Objects.requireNonNull(trmdl.materials(0)))));
-        var trmmt = locateTrmmt(parentDir, Objects.requireNonNull(trmdl.materials(0)));
+//        var trmtr = TRMTR.getRootAsTRMTR(read(parentDir.resolve(Objects.requireNonNull(trmdl.materials(0)))));
+//        var trmmt = locateTrmmt(parentDir, Objects.requireNonNull(trmdl.materials(0)));
         var model = new Model();
 
         // Meshes
@@ -91,8 +91,7 @@ public class FileImporter {
                     BLEND_WEIGHTS;
 
                     public static AttributeType get(long id) {
-                        for (var i = 0; i < values().length; i++) if (i == id) return values()[i];
-                        throw new RuntimeException("Unknown Attribute Type " + id);
+                        return values()[(int) id];
                     }
                 }
 
