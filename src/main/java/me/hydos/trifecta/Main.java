@@ -17,6 +17,7 @@ import org.lwjgl.system.Configuration;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
@@ -46,18 +47,27 @@ public class Main {
         var window = new Window();
         var editor = new EditorLogic(window);
         setUpSharedGLFWCallbacks(window, editor);
+        try {
+            var texture = new DDSTexture(Path.of("D:\\Git Repos\\Trifecta\\run\\pm0025_00_00_body_a_nrm.dds"));
 
-        POKEMON_SIMPLE = new ShaderProgram.Builder()
-                .shader(getShader("simple.vs"), getShader("simple.fs"))
-                .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
-                .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
-                .supplyUniform(ShaderProgram.Builder.UniformType.INSTANCE, "modelMatrix", ctx -> ctx.uniform().uploadMat4f(ctx.instance().getTransform()))
-                .build();
+            POKEMON_SIMPLE = new ShaderProgram.Builder()
+                    .shader(getShader("simple.vs"), getShader("simple.fs"))
+                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
+                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
+                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "textureSampler", ctx -> {
+                        texture.bind(0);
+                        ctx.uniform().uploadInt(0);
+                    })
+                    .supplyUniform(ShaderProgram.Builder.UniformType.INSTANCE, "modelMatrix", ctx -> ctx.uniform().uploadMat4f(ctx.instance().getTransform()))
+                    .build();
 
-        window.run(w -> {
-            glEnable(GL_DEPTH_TEST);
-            GRAPH.render();
-        }, editor::update);
+            window.run(w -> {
+                glEnable(GL_DEPTH_TEST);
+                GRAPH.render();
+            }, editor::update);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void setUpSharedGLFWCallbacks(Window window, EditorLogic editorLogic) {

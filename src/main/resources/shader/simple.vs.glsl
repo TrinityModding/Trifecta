@@ -8,6 +8,8 @@ layout(location = 4) in vec4 inBoneIds;
 layout(location = 5) in vec4 inBoneWeights;
 
 out vec4 color;
+out vec2 fragTexCoord;
+
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -17,4 +19,5 @@ void main() {
     mat4 modelViewProjectionMatrix = projectionMatrix * viewMatrix * modelMatrix;
     gl_Position = modelViewProjectionMatrix * vec4(inPosition, 1.0);
     color = vec4(gl_Position.rgb, 1.0);
+    fragTexCoord = inTexCoord;
 }
