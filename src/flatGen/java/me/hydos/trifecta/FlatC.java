@@ -12,7 +12,7 @@ public class FlatC {
 
     public static void generateSource(String pkgPrefix, Path srcDir, boolean useObjApi, Path schema) {
         try {
-            var command = new ArrayList<>(List.of("D:/NewProjects/Pokemon/google/flatbuffers/Debug/flatc.exe", "-j"));
+            var command = new ArrayList<>(List.of("flatc", "-j"));
 
             if (useObjApi) command.add("--gen-object-api");
             if (pkgPrefix != null) {

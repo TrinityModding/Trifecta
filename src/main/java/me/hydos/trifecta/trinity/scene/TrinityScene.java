@@ -1,9 +1,6 @@
 package me.hydos.trifecta.trinity.scene;
 
-import me.hydos.trifecta.flatbuffers.Titan.TrinityScene.SceneEntryT;
-import me.hydos.trifecta.flatbuffers.Titan.TrinityScene.trinity_SceneObjectT;
-import me.hydos.trifecta.flatbuffers.Titan.TrinityScene.trinity_SceneT;
-import me.hydos.trifecta.flatbuffers.Titan.TrinityScene.trinity_ScriptComponentT;
+import me.hydos.trifecta.flatbuffers.Titan.TrinityScene.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,6 +37,8 @@ public class TrinityScene {
         var data = switch (scnEntry.getTypeName()) {
             case "trinity_SceneObject" -> trinity_SceneObjectT.deserializeFromBinary(scnEntry.getNestedType());
             case "trinity_ScriptComponent" -> trinity_ScriptComponentT.deserializeFromBinary(scnEntry.getNestedType());
+            case "trinity_OverrideSensorData" -> trinity_OverrideSensorDataT.deserializeFromBinary(scnEntry.getNestedType());
+            case "SubScene" -> SubSceneT.deserializeFromBinary(scnEntry.getNestedType());
             default -> throw new RuntimeException("Unknown scene entry type " + scnEntry.getTypeName());
         };
 
