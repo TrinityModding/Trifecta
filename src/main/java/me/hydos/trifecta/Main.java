@@ -30,8 +30,8 @@ public class Main {
     private static final int FOV = 90;
 
     public static void main(String[] args) throws IOException {
-        var startup0 = TrinityScene.read(Paths.get("F:/PokemonScarlet/arc/world/scene/parts/field/outside/field_outside/resident_field_/resident_field_0.trscn"));
-        var startupScript = ((trinity_ScriptComponentT) startup0.objects.get(0).children().get(0).data());
+//        var startup0 = TrinityScene.read(Paths.get("F:/PokemonScarlet/arc/world/scene/parts/field/outside/field_outside/resident_field_/resident_field_0.trscn"));
+//        var startupScript = ((trinity_ScriptComponentT) startup0.objects.get(0).children().get(0).data());
 
         // Create a Lua environment
         var globals = JsePlatform.standardGlobals();
