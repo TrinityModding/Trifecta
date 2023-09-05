@@ -1,6 +1,8 @@
 package me.hydos.trifecta;
 
+import gg.generations.pokeutils.reader.TextureReference;
 import gg.generations.rarecandy.arceus.core.RareCandyScene;
+import gg.generations.rarecandy.legacy.model.misc.Texture;
 import gg.generations.rarecandy.legacy.pipeline.ShaderProgram;
 import me.hydos.trifecta.editor.EditorLogic;
 import me.hydos.trifecta.flatbuffers.Titan.TrinityScene.trinity_ScriptComponentT;
@@ -29,34 +31,19 @@ public class Main {
     public static ShaderProgram POKEMON_SIMPLE;
     private static final int FOV = 90;
 
-    public static void main(String[] args) throws IOException {
-//        var startup0 = TrinityScene.read(Paths.get("F:/PokemonScarlet/arc/world/scene/parts/field/outside/field_outside/resident_field_/resident_field_0.trscn"));
-//        var startupScript = ((trinity_ScriptComponentT) startup0.objects.get(0).children().get(0).data());
-
-        // Create a Lua environment
-        var globals = JsePlatform.standardGlobals();
-
-        // Load and execute the compiled Lua bytecode
-        try {
-            var chunk = globals.loadfile("F:/PokemonScarlet/arc/script/lua/bin/release/main/main.blua");
-            chunk.call();
-        } catch (LuaError e) {
-            System.out.println("Error loading or executing Lua bytecode: " + e.getMessage());
-        }
-
+    public static void main(String[] args) {
         var window = new Window();
         var editor = new EditorLogic(window);
         setUpSharedGLFWCallbacks(window, editor);
         try {
-            var texture = new DDSTexture(Path.of("D:/Git Repos/Trifecta/run/pm0025_00_00_body_a_nrm.dds"));
+            var tex = new Texture(TextureReference.read(Paths.get("C:/Users/hydos/Desktop/notex.png")));
 
             POKEMON_SIMPLE = new ShaderProgram.Builder()
                     .shader(getShader("simple.vs"), getShader("simple.fs"))
                     .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
                     .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
                     .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "textureSampler", ctx -> {
-                        texture.bind(0);
-                        ctx.uniform().uploadInt(0);
+                        ctx.bindAndUploadTex(tex, 0);
                     })
                     .supplyUniform(ShaderProgram.Builder.UniformType.INSTANCE, "modelMatrix", ctx -> ctx.uniform().uploadMat4f(ctx.instance().getTransform()))
                     .build();
