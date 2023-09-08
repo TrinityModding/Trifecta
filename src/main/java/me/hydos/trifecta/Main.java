@@ -32,29 +32,29 @@ public class Main {
     private static final int FOV = 90;
 
     public static void main(String[] args) {
-        var window = new Window();
-        var editor = new EditorLogic(window);
-        setUpSharedGLFWCallbacks(window, editor);
-        try {
-            var tex = new Texture(TextureReference.read(Paths.get("C:/Users/hydos/Desktop/notex.png")));
-
-            POKEMON_SIMPLE = new ShaderProgram.Builder()
-                    .shader(getShader("simple.vs"), getShader("simple.fs"))
-                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
-                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
-                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "textureSampler", ctx -> {
-                        ctx.bindAndUploadTex(tex, 0);
-                    })
-                    .supplyUniform(ShaderProgram.Builder.UniformType.INSTANCE, "modelMatrix", ctx -> ctx.uniform().uploadMat4f(ctx.instance().getTransform()))
-                    .build();
-
-            window.run(w -> {
-                glEnable(GL_DEPTH_TEST);
-                GRAPH.render();
-            }, editor::update);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        var window = new Window();
+//        var editor = new EditorLogic(window);
+//        setUpSharedGLFWCallbacks(window, editor);
+//        try {
+//            var tex = new Texture(TextureReference.read(Paths.get("C:/Users/hydos/Desktop/notex.png")));
+//
+//            POKEMON_SIMPLE = new ShaderProgram.Builder()
+//                    .shader(getShader("simple.vs"), getShader("simple.fs"))
+//                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "projectionMatrix", ctx -> ctx.uniform().uploadMat4f(calculateProjection(window)))
+//                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "viewMatrix", ctx -> ctx.uniform().uploadMat4f(editor.getEditorCamera()))
+//                    .supplyUniform(ShaderProgram.Builder.UniformType.SHARED, "textureSampler", ctx -> {
+//                        ctx.bindAndUploadTex(tex, 0);
+//                    })
+//                    .supplyUniform(ShaderProgram.Builder.UniformType.INSTANCE, "modelMatrix", ctx -> ctx.uniform().uploadMat4f(ctx.instance().getTransform()))
+//                    .build();
+//
+//            window.run(w -> {
+//                glEnable(GL_DEPTH_TEST);
+//                GRAPH.render();
+//            }, editor::update);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     private static void setUpSharedGLFWCallbacks(Window window, EditorLogic editorLogic) {
